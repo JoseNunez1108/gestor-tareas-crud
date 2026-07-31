@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestor de tareas</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header class="encabezado">
+        <h1>Gestor de tareas</h1>
+        <p>Crea, consulta, actualiza y elimina tus tareas.</p>
+    </header>
+
+    <main class="contenedor">
+
+        <section class="formulario-contenedor">
+            <h2>Registrar tarea</h2>
+
+            <form id="task-form">
+                <div class="campo">
+                    <label for="task-title">Título</label>
+
+                    <input
+                        type="text"
+                        id="task-title"
+                        placeholder="Escribe el título de la tarea"
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="task-description">Descripción</label>
+
+                    <textarea
+                        id="task-description"
+                        placeholder="Escribe una descripción"
+                    ></textarea>
+                </div>
+
+                <div class="campo">
+                    <label for="task-status">Estado</label>
+
+                    <select id="task-status">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En proceso">En proceso</option>
+                        <option value="Completada">Completada</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="save-button">
+                    Guardar tarea
+                </button>
+            </form>
+
+            <p id="message"></p>
+        </section>
+
+        <section class="lista-contenedor">
+            <h2>Lista de tareas</h2>
+
+            <div id="task-list">
+                <p class="empty-message">
+                    No hay tareas registradas.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
