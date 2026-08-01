@@ -58,3 +58,22 @@
     color: #6b7280;
     font-size: 12px;
 }
+.task-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.task-actions button {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.edit-button {
+    background-color: #b65f00;
+}
+
+.edit-button:hover {
+    background-color: #8f4b00;
+}
