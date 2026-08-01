@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const taskForm = document.getElementById("task-form");
 const titleInput = document.getElementById("task-title");
@@ -6,11 +6,14 @@ const descriptionInput = document.getElementById("task-description");
 const statusInput = document.getElementById("task-status");
 const messageElement = document.getElementById("message");
 const taskList = document.getElementById("task-list");
+const saveButton = document.getElementById("save-button");
 
 const STORAGE_KEY = "tasks";
 
+let editingTaskId = null;
+
 /**
- * Obtiene las tareas guardadas en el navegador.
+ * Obtiene las tareas almacenadas en el navegador.
  *
  * @returns {Array}
  */
@@ -57,7 +60,7 @@ function showMessage(text, type) {
 }
 
 /**
- * Genera un identificador para una nueva tarea.
+ * Genera un identificador para una tarea.
  *
  * @returns {string}
  */
@@ -73,7 +76,7 @@ function generateTaskId() {
 }
 
 /**
- * Convierte la fecha guardada a un formato legible.
+ * Convierte una fecha guardada a un formato legible.
  *
  * @param {string} dateString
  * @returns {string}
@@ -92,7 +95,7 @@ function formatDate(dateString) {
 }
 
 /**
- * Obtiene una clase CSS según el estado de la tarea.
+ * Obtiene una clase CSS según el estado.
  *
  * @param {string} status
  * @returns {string}
@@ -111,7 +114,47 @@ function getStatusClass(status) {
 }
 
 /**
- * Crea visualmente una tarjeta de tarea.
+ * Devuelve el formulario a su estado inicial.
+ */
+function resetFormState() {
+    editingTaskId = null;
+    taskForm.reset();
+    saveButton.textContent = "Guardar tarea";
+    titleInput.focus();
+}
+
+/**
+ * Coloca una tarea en el formulario para editarla.
+ *
+ * @param {string} taskId
+ */
+function startEditingTask(taskId) {
+    const tasks = getTasks();
+    const task = tasks.find((item) => item.id === taskId);
+
+    if (!task) {
+        showMessage("No fue posible encontrar la tarea.", "error");
+        return;
+    }
+
+    editingTaskId = task.id;
+
+    titleInput.value = task.title;
+    descriptionInput.value = task.description;
+    statusInput.value = task.status;
+
+    saveButton.textContent = "Actualizar tarea";
+
+    taskForm.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    titleInput.focus();
+}
+
+/**
+ * Crea una tarjeta visual para una tarea.
  *
  * @param {Object} task
  * @returns {HTMLElement}
@@ -139,9 +182,28 @@ function createTaskCard(task) {
 
     const date = document.createElement("small");
     date.className = "task-date";
-    date.textContent = `Creada: ${formatDate(task.createdAt)}`;
 
-    article.append(header, description, date);
+    const dateText = task.updatedAt
+        ? `Actualizada: ${formatDate(task.updatedAt)}`
+        : `Creada: ${formatDate(task.createdAt)}`;
+
+    date.textContent = dateText;
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "edit-button";
+    editButton.textContent = "Editar";
+
+    editButton.addEventListener("click", () => {
+        startEditingTask(task.id);
+    });
+
+    actions.appendChild(editButton);
+
+    article.append(header, description, date, actions);
 
     return article;
 }
@@ -164,13 +226,63 @@ function renderTasks() {
     }
 
     tasks.forEach((task) => {
-        const taskCard = createTaskCard(task);
-        taskList.appendChild(taskCard);
+        taskList.appendChild(createTaskCard(task));
     });
 }
 
 /**
- * Procesa el registro de una tarea.
+ * Crea una nueva tarea.
+ *
+ * @param {string} title
+ * @param {string} description
+ * @param {string} status
+ */
+function createTask(title, description, status) {
+    const tasks = getTasks();
+
+    const newTask = {
+        id: generateTaskId(),
+        title,
+        description,
+        status,
+        createdAt: new Date().toISOString()
+    };
+
+    tasks.push(newTask);
+    saveTasks(tasks);
+}
+
+/**
+ * Actualiza una tarea existente.
+ *
+ * @param {string} taskId
+ * @param {string} title
+ * @param {string} description
+ * @param {string} status
+ * @returns {boolean}
+ */
+function updateTask(taskId, title, description, status) {
+    const tasks = getTasks();
+    const taskIndex = tasks.findIndex((task) => task.id === taskId);
+
+    if (taskIndex === -1) {
+        return false;
+    }
+
+    tasks[taskIndex] = {
+        ...tasks[taskIndex],
+        title,
+        description,
+        status,
+        updatedAt: new Date().toISOString()
+    };
+
+    saveTasks(tasks);
+    return true;
+}
+
+/**
+ * Procesa el formulario.
  */
 taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -185,25 +297,27 @@ taskForm.addEventListener("submit", (event) => {
         return;
     }
 
-    const newTask = {
-        id: generateTaskId(),
-        title,
-        description,
-        status,
-        createdAt: new Date().toISOString()
-    };
+    if (editingTaskId !== null) {
+        const wasUpdated = updateTask(
+            editingTaskId,
+            title,
+            description,
+            status
+        );
 
-    const tasks = getTasks();
+        if (!wasUpdated) {
+            showMessage("No fue posible actualizar la tarea.", "error");
+            return;
+        }
 
-    tasks.push(newTask);
-    saveTasks(tasks);
+        showMessage("La tarea fue actualizada correctamente.", "success");
+    } else {
+        createTask(title, description, status);
+        showMessage("La tarea fue guardada correctamente.", "success");
+    }
 
     renderTasks();
-
-    taskForm.reset();
-    titleInput.focus();
-
-    showMessage("La tarea fue guardada correctamente.", "success");
+    resetFormState();
 });
 
 renderTasks();
