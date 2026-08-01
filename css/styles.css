@@ -1,3 +1,109 @@
+﻿* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #f4f6f8;
+    color: #202124;
+    font-family: Arial, sans-serif;
+}
+
+.encabezado {
+    padding: 30px 20px;
+    background-color: #1f4e79;
+    color: white;
+    text-align: center;
+}
+
+.encabezado h1 {
+    margin-bottom: 8px;
+}
+
+.contenedor {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 24px;
+    width: min(1100px, 92%);
+    margin: 30px auto;
+}
+
+.formulario-contenedor,
+.lista-contenedor {
+    padding: 24px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.formulario-contenedor h2,
+.lista-contenedor h2 {
+    margin-bottom: 20px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.campo label {
+    margin-bottom: 6px;
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #c5c9ce;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.campo textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    background-color: #1f4e79;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #173c5e;
+}
+
+.empty-message {
+    padding: 20px;
+    color: #6b7280;
+    text-align: center;
+}
+
+.message {
+    min-height: 24px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.message.success {
+    color: #1b7f3a;
+}
+
+.message.error {
+    color: #b42318;
+}
+
 #task-list {
     display: flex;
     flex-direction: column;
@@ -58,9 +164,11 @@
     color: #6b7280;
     font-size: 12px;
 }
+
 .task-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     margin-top: 14px;
 }
 
@@ -76,4 +184,31 @@
 
 .edit-button:hover {
     background-color: #8f4b00;
+}
+
+.delete-button {
+    background-color: #b42318;
+}
+
+.delete-button:hover {
+    background-color: #851c13;
+}
+
+@media (max-width: 750px) {
+    .contenedor {
+        grid-template-columns: 1fr;
+    }
+
+    .task-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .task-actions {
+        justify-content: stretch;
+    }
+
+    .task-actions button {
+        flex: 1;
+    }
 }

@@ -154,6 +154,41 @@ function startEditingTask(taskId) {
 }
 
 /**
+ * Elimina una tarea después de solicitar confirmación.
+ *
+ * @param {string} taskId
+ */
+function deleteTask(taskId) {
+    const tasks = getTasks();
+    const task = tasks.find((item) => item.id === taskId);
+
+    if (!task) {
+        showMessage("No fue posible encontrar la tarea.", "error");
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `¿Seguro que deseas eliminar la tarea "${task.title}"?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const remainingTasks = tasks.filter((item) => item.id !== taskId);
+
+    saveTasks(remainingTasks);
+
+    if (editingTaskId === taskId) {
+        resetFormState();
+    }
+
+    renderTasks();
+
+    showMessage("La tarea fue eliminada correctamente.", "success");
+}
+
+/**
  * Crea una tarjeta visual para una tarea.
  *
  * @param {Object} task
@@ -201,7 +236,16 @@ function createTaskCard(task) {
         startEditingTask(task.id);
     });
 
-    actions.appendChild(editButton);
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-button";
+    deleteButton.textContent = "Eliminar";
+
+    deleteButton.addEventListener("click", () => {
+        deleteTask(task.id);
+    });
+
+    actions.append(editButton, deleteButton);
 
     article.append(header, description, date, actions);
 
@@ -278,11 +322,12 @@ function updateTask(taskId, title, description, status) {
     };
 
     saveTasks(tasks);
+
     return true;
 }
 
 /**
- * Procesa el formulario.
+ * Procesa el formulario para crear o actualizar una tarea.
  */
 taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -310,10 +355,17 @@ taskForm.addEventListener("submit", (event) => {
             return;
         }
 
-        showMessage("La tarea fue actualizada correctamente.", "success");
+        showMessage(
+            "La tarea fue actualizada correctamente.",
+            "success"
+        );
     } else {
         createTask(title, description, status);
-        showMessage("La tarea fue guardada correctamente.", "success");
+
+        showMessage(
+            "La tarea fue guardada correctamente.",
+            "success"
+        );
     }
 
     renderTasks();
